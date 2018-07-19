@@ -215,6 +215,8 @@ server {
 	include /etc/nginx/network_internal.conf;
 	{{ end }}
 
+	keepalive_timeout   70;
+
 	{{ if eq $ssl_policy "Mozilla-Modern" }}
 	ssl_protocols TLSv1.2 TLSv1.3;
 	ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
@@ -284,6 +286,9 @@ server {
 		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ end }}
 
+		proxy_read_timeout 86400;
+                proxy_connect_timeout 3000;
+
 		{{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
@@ -330,6 +335,10 @@ server {
 		{{ else }}
 		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ end }}
+
+		proxy_read_timeout 86400;
+	        proxy_connect_timeout 3000;
+
 		{{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
